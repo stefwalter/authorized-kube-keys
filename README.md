@@ -27,3 +27,5 @@ Restart sshd.
 
 The tool doesn't yet have a way to add/remove keys. Look in the examples directory
 for some ```kubectl patch``` JSON you can use.
+
+This proof of concept places keys in the ```metadata.annotations``` Node data. Some further work here: https://github.com/kubernetes/kubernetes/pull/23811
