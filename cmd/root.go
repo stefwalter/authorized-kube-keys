@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"os/exec"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -62,7 +63,7 @@ func NodeName() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(name), nil
+	return strings.TrimSpace(string(name)), nil
 }
 
 var RootCmd = &cobra.Command{
