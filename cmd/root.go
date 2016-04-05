@@ -1,16 +1,12 @@
 package cmd
 
 import (
-	"errors"
 	"os/exec"
 	"strings"
 
 	"github.com/spf13/cobra"
 
-	"k8s.io/kubernetes/pkg/api"
-	"k8s.io/kubernetes/pkg/api/unversioned"
-	"k8s.io/kubernetes/pkg/client/restclient"
-	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
+	"github.com/stefwalter/authorized-kube-keys/pkg/client"
 )
 
 var masterUrl string
@@ -24,34 +20,8 @@ func init() {
 		"If non-empty, will use this string identification instead of the actual hostname")
 }
 
-func RestConfig() (*restclient.Config, error) {
-	if kubeConfig == "" && masterUrl == "" {
-		return nil, errors.New("Neither --kubeconfig nor --master was specified.")
-	}
-
-	data, err := clientcmd.LoadFromFile(kubeConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	config, err := clientcmd.NewNonInteractiveClientConfig(*data, data.CurrentContext,
-		&clientcmd.ConfigOverrides{}).ClientConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	groupVersion := unversioned.GroupVersion{"api", "v1"}
-	config.ContentConfig.GroupVersion = &groupVersion
-	config.Codec = api.Codecs.LegacyCodec(groupVersion)
-	return config, nil
-}
-
-func RestClient() (*restclient.RESTClient, error) {
-	config, err := RestConfig()
-	if err != nil {
-		return nil, err
-	}
-	return restclient.RESTClientFor(config)
+func Client() *client.Client {
+	return &client.Client{KubeConfig: kubeConfig, MasterUrl: masterUrl }
 }
 
 func NodeName() (string, error) {

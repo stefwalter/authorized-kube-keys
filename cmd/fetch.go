@@ -3,11 +3,10 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
-
-	"k8s.io/kubernetes/pkg/api"
 
 	"github.com/spf13/cobra"
+
+	"github.com/stefwalter/authorized-kube-keys/pkg/node"
 )
 
 func init() {
@@ -29,30 +28,12 @@ var fetchCmd = &cobra.Command{
 }
 
 func performFetch() error {
-	client, err := RestClient()
-	if err != nil {
-		return err
-	}
+	client := Client()
 
 	name, err := NodeName()
 	if err != nil {
 		return err
 	}
 
-	result := client.Verb("GET").
-		AbsPath("api", "v1", "nodes", name).
-		Do()
-
-	node := &api.Node{}
-	err = result.Into(node)
-	if err != nil {
-		return err
-	}
-
-	for k, v := range node.ObjectMeta.Annotations {
-		if strings.HasPrefix(k, "authorized-key-") {
-			fmt.Println(v)
-		}
-	}
-	return nil
+	return node.PrintAuthorized(client, name)
 }

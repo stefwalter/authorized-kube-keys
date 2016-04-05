@@ -2,17 +2,12 @@ Proof of concept for storing SSH authorized-keys in Kubernetes Node info
 
 ### Building
 
-Make sure to either set your $GOPATH to point to a checked out
-```kubernetes/Godeps/_workspace``` directory. At least until the following
-kubernetes pull requests are included:
-
- * https://github.com/kubernetes/kubernetes/pull/23789
- * https://github.com/kubernetes/kubernetes/pull/23632
-
 Then just ```go install``` and copy the resulting binary to ```/usr/local/bin```
 on your nodes.
 
 ### Running
+
+Make sure to have ```kubectl``` installed.
 
 Add the following lines to your ```/etc/sshd/sshd_config``` on each Node:
 
