@@ -29,11 +29,5 @@ var fetchCmd = &cobra.Command{
 
 func performFetch() error {
 	client := Client()
-
-	name, err := NodeName()
-	if err != nil {
-		return err
-	}
-
-	return node.PrintAuthorized(client, name)
+	return node.PrintAuthorized(client)
 }

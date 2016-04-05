@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"os/exec"
-	"strings"
-
 	"github.com/spf13/cobra"
 
 	"github.com/stefwalter/authorized-kube-keys/pkg/client"
@@ -21,19 +18,7 @@ func init() {
 }
 
 func Client() *client.Client {
-	return &client.Client{KubeConfig: kubeConfig, MasterUrl: masterUrl }
-}
-
-func NodeName() (string, error) {
-	if len(hostOverride) != 0 {
-		return hostOverride, nil
-	}
-
-	name, err := exec.Command("uname", "-n").Output()
-	if err != nil {
-		return "", err
-	}
-	return strings.TrimSpace(string(name)), nil
+	return &client.Client{KubeConfig: kubeConfig, MasterUrl: masterUrl, DefaultNode: hostOverride }
 }
 
 var RootCmd = &cobra.Command{
