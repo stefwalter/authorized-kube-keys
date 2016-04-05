@@ -3,7 +3,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -36,7 +38,12 @@ func performPush(pubfiles []string) error {
 	}
 	client := Client()
 	for _, pubfile := range pubfiles {
-		err := node.PushAuthorized(client, pubfile)
+		data, err := ioutil.ReadFile(pubfile)
+		if err != nil {
+			return err
+		}
+
+		err = node.PushAuthorized(client, strings.TrimSpace(string(data)))
 		if err != nil {
 			return err
 		}

@@ -60,6 +60,11 @@ func (cl *Client) Get(kind string, name string) ([]byte, error) {
 	return cl.execute(args)
 }
 
+func (cl *Client) List(kind string) ([]byte, error) {
+	args := []string{"get", kind, "--output=json"}
+	return cl.execute(args)
+}
+
 func (cl *Client) Patch(kind string, name string, patch string) ([]byte, error) {
 	if name == "" {
 		var err error

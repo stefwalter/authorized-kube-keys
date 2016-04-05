@@ -5,33 +5,35 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"io"
-	"io/ioutil"
-	"strings"
 
 	"github.com/stefwalter/authorized-kube-keys/pkg/client"
 )
 
-func PushAuthorized(cli *client.Client, pubfile string) error {
+func PushAuthorized(cli *client.Client, data string) error {
+	node, err := fetchNode(cli)
+	if err != nil {
+		return err
+	}
+
+	return PushAuthorizedNode(cli, *node, data)
+}
+
+func PushAuthorizedNode(cli *client.Client, node Node, data string) error {
 	uuid := make([]byte, 16)
 	n, err := io.ReadFull(rand.Reader, uuid)
 	if n != len(uuid) || err != nil {
 		return err
 	}
 
-	data, err := ioutil.ReadFile(pubfile)
-	if err != nil {
-		return err
-	}
+	key := authorizedKeyName + hex.EncodeToString(uuid)
 
-	name := authorizedKeyName + hex.EncodeToString(uuid)
-
-	node, err := fetchNode(cli)
 	if node.NodeMeta.Annotations == nil {
 		node.NodeMeta.Annotations = make(map[string]string)
 	}
-	node.NodeMeta.Annotations[name] = strings.TrimSpace(string(data))
+	node.NodeMeta.Annotations[key] = data
 
 	// Empty these before marshalling a patch
+	name := node.NodeMeta.Name
 	node.NodeMeta.Name = ""
 
 	// TODO: Move away from strategic merge to avoid round tripping data
@@ -40,6 +42,7 @@ func PushAuthorized(cli *client.Client, pubfile string) error {
 		return err
 	}
 
-	_, err = cli.Patch("node", "", string(patch))
+	_, err = cli.Patch("node", name, string(patch))
 	return err
 }
+
